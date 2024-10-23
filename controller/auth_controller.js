@@ -3,6 +3,7 @@ const { validationResult } = require("express-validator");
 const { User } = require("../models/user");
 const { Token } = require("../models/token");
 const jwt = require("jsonwebtoken");
+const mailSender = require("../helpers/email_senders");
 exports.register = async function (req, res) {
   //validate the user
   const errors = validationResult(req);
@@ -81,7 +82,34 @@ exports.login = async function (req, res) {
   }
 };
 
-exports.forgetPassword = async function (req, res) {};
+exports.forgetPassword = async function (req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "User with that email does NOT exists!" });
+    }
+
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    user.resetPasswordOtp = otp;
+    user.resetPasswordOtpExpires = Date.now() + 600000;
+    await user.save();
+    const response = await mailSender.sendMail(
+      email,
+      "Password Reset OTP",
+      `Your OTP for password is ${otp}`
+    );
+    return res.json({ message: response});
+  } catch (error) {
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
 //verify token
 exports.verifyToken = async function (req, res) {
   try {
