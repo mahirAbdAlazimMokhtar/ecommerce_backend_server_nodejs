@@ -1,5 +1,15 @@
 {
     "cSpell.words": [
         "ecommerce"
-    ]
+    ],
+    "editor.fontSize": 15,
+"editor.tabSize": 5,
+"terminal.integrated.fontSize": 12,
+"window.zoomLevel": 1,
+"[Log]": {
+  "editor.fontSize": 14
+},
+"customizeUI.stylesheet": {
+    ".explorer-viewlet .mac": "font-size: 1.2em !important; overflow: auto; border-left:none!important",
+},
 }
