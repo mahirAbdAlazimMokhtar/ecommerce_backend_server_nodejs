@@ -35,7 +35,7 @@ function authjwt() {
 }
 async function isRevoked(req, jwt) {
   const authHeader = req.header("Authorization");
-  if (!authHeader.startWith("Bearer")) return true;
+  if (!authHeader.starsWith("Bearer")) return true;
 
   const accessToken = authHeader.replace("Bearer", "").trim();
   const token = await Token.findOne({ accessToken });
