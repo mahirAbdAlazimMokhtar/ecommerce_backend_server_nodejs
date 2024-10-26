@@ -1,6 +1,14 @@
-const { expressJwt: expJwt } = require("express-jwt");
+const { expressjwt: expJwt } = require("express-jwt");
 const { Token } = require("../models/token");
-function authJwt() {
+/**
+ * Express middleware that verifies the JWT token sent in the Authorization header.
+ * If the token is not sent or invalid, it sends a 401 Unauthorized response.
+ * If the token is valid, it adds the user data to the request object.
+ * We also add a middleware to check if the token is revoked or not.
+ * If the token is revoked, it sends a 401 Unauthorized response.
+ * The middleware is not applied to the specified paths.
+ */
+function authjwt() {
   const API = process.env.API_URL;
   return expJwt({
     secret: process.env.ACCESS_TOKEN_SECRET,
@@ -39,4 +47,4 @@ async function isRevoked(req, jwt) {
 
   return adminFault || !token;
 }
-module.exports = authJwt;
+module.exports = authjwt;

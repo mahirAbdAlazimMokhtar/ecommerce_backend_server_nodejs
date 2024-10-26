@@ -4,6 +4,9 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 require('dotenv/config');
+const authjwt = require('./middlewares/jwt');
+const errorHandler = require('./middlewares/error_handler');
+const authRouter = require('./routes/auth_routes');
 
 const app = express();
 const env = process.env;
@@ -13,10 +16,9 @@ app.use(bodyParser.json());
 app.use(morgan('tiny'));
 app.use(cors());
 app.options('*',cors());
-app.use(authJwt());
+app.use(authjwt());
+app.use(errorHandler);
 
-const authRouter = require('./routes/auth_routes');
-const authJwt = require('./middlewares/jwt');
 app.use(`${API}/`,authRouter);
 
 const PORT=env.PORT;

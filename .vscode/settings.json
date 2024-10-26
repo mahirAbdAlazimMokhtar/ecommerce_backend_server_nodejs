@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
-        "ecommerce"
+        "authjwt",
+        "ecommerce",
+        "expressjwt"
     ],
     "editor.fontSize": 15,
 "editor.tabSize": 5,
