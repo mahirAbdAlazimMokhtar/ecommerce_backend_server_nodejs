@@ -7,6 +7,7 @@ require('dotenv/config');
 const authjwt = require('./middlewares/jwt');
 const errorHandler = require('./middlewares/error_handler');
 const authRouter = require('./routes/auth_routes');
+const usersRouter = require('./routes/users_routers');
 
 const app = express();
 const env = process.env;
@@ -20,6 +21,7 @@ app.use(authjwt());
 app.use(errorHandler);
 
 app.use(`${API}/`,authRouter);
+app.use(`${API}/users`,usersRouter);
 
 const PORT=env.PORT;
 const HOSTNAME=env.HOSTNAME;
