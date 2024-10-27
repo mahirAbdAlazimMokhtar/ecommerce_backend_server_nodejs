@@ -6,8 +6,7 @@ const mongoose = require('mongoose');
 require('dotenv/config');
 const authjwt = require('./middlewares/jwt');
 const errorHandler = require('./middlewares/error_handler');
-const authRouter = require('./routes/auth_routes');
-const usersRouter = require('./routes/users_routers');
+
 
 const app = express();
 const env = process.env;
@@ -20,8 +19,13 @@ app.options('*',cors());
 app.use(authjwt());
 app.use(errorHandler);
 
+const authRouter = require('./routes/auth_routes');
+const usersRouter = require('./routes/users_routers');
+const adminRouter = require('./routes/admin_routers');
+
 app.use(`${API}/`,authRouter);
 app.use(`${API}/users`,usersRouter);
+app.use(`${API}/admin`,adminRouter) ;
 
 const PORT=env.PORT;
 const HOSTNAME=env.HOSTNAME;

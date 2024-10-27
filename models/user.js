@@ -22,6 +22,8 @@ const userSchema = new Schema({
     },
   ],
 });
+userSchema.set('toObject',{virtuals:true});
+userSchema.set('toJSON',{virtuals:true});
 //How To Make Email Unique ?
 userSchema.index({email:1},{unique:true});
 exports.User = model('User',userSchema);
