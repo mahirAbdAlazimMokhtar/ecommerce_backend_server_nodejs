@@ -1,4 +1,4 @@
-const { Schema, model } = required("mongoose");
+const { Schema, model } = require("mongoose");
 
 const orderItemsSchema = new Schema({
   order: { type: Schema.Types.ObjectId, ref: "Order", required: true },

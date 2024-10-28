@@ -12,6 +12,7 @@ const userSchema = new Schema({
   isAdmin: { type: Boolean, default: false },
   resetPasswordOtp: Number,
   resetPasswordOtpExpires: Date,
+  cart: [{type:Schema.Types.ObjectId,ref:'CartProduct'}],
   wishlist: [
     {
       productId: { type: Schema.Types.ObjectId, ref: "Product" },
