@@ -1,4 +1,4 @@
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
@@ -26,6 +26,7 @@ const adminRouter = require('./routes/admin_routers');
 app.use(`${API}/`,authRouter);
 app.use(`${API}/users`,usersRouter);
 app.use(`${API}/admin`,adminRouter) ;
+app.use('/public', express.static(__dirname + '/public'));
 
 const PORT=env.PORT;
 const HOSTNAME=env.HOSTNAME;
