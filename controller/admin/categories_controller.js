@@ -21,7 +21,8 @@ exports.addCategory = async (req, res) => {
     req.body["image"] = `${req.protocol}://${req.get("host")}/${image.path}`;
     const category = new Category(req.body);
     await category.save();
-    if(!category) return res.status(500).json({message: "Could not create category"});
+    if (!category)
+      return res.status(500).json({ message: "Could not create category" });
 
     return res.status(201).json(category);
   } catch (error) {
@@ -35,4 +36,19 @@ exports.addCategory = async (req, res) => {
 
 exports.editCategory = async (req, res) => {};
 
-exports.deleteCategory = async (req, res) => {};
+exports.deleteCategory = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    if (!category)
+      return res.status(404).json({ message: "Category not found!" });
+    category.markedForDeletion = true;
+    await category.save();
+    return res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
