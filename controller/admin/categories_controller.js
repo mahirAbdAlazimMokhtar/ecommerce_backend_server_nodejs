@@ -34,7 +34,24 @@ exports.addCategory = async (req, res) => {
   }
 };
 
-exports.editCategory = async (req, res) => {};
+exports.editCategory = async (req, res) => {
+  try {
+    const {name ,icon , color} = req.body;
+    const category = await Category.findByIdAndUpdate(
+      req.params.id,
+      {name,icon,color},
+      { new: true }
+    );
+    if(!category) return res.status(404).json({message:"Category not found!"});
+    return res.status(200).json(category);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
 
 exports.deleteCategory = async (req, res) => {
   try {
