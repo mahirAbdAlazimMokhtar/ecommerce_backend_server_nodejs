@@ -12,7 +12,7 @@ function authjwt() {
   const API = process.env.API_URL;
   return expJwt({
     secret: process.env.ACCESS_TOKEN_SECRET,
-    algorithms: ["HS256"],
+    algorithms: ['HS256'],
     isRevoked: isRevoked,
   }).unless({
     path: [
@@ -34,8 +34,8 @@ function authjwt() {
   });
 }
 async function isRevoked(req, jwt) {
-  const authHeader = req.header("Authorization");
-  if (!authHeader.starsWith("Bearer")) return true;
+  const authHeader = req.header('Authorization');
+  if (!authHeader.startsWith("Bearer ")) return true;
 
   const accessToken = authHeader.replace("Bearer", "").trim();
   const token = await Token.findOne({ accessToken });
