@@ -44,7 +44,16 @@ exports.getOrdersCount = async (_, res) => {
 
 exports.changeOrdersStatus = async (req, res) => {
   try {
-    
+    const orderId = req.params.id;
+    const newStatus = req.body.status;
+    let order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found!" });
+    if(!order.statusHistory.includes(order.status)){
+      order.statusHistory.push(order.status);
+    }
+    order.status = newStatus;
+    await order.save();
+    return res.status(200).json(order);
   } catch (error) {
     console.error(error);
     return res.status(500).json({
