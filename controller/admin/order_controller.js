@@ -30,7 +30,7 @@ exports.getOrders = async (req, res) => {
 };
 exports.getOrdersCount = async (_, res) => {
   try {
-    const count = awaitOrder.countDocuments();
+    const count = await Order.countDocuments();
     if (!count)
       return res.status(500).json({ message: "Could not get the order count" });
     return res.status(200).json({ count });
