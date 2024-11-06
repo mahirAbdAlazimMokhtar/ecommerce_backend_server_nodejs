@@ -1,4 +1,5 @@
 const { Order } = require("../../models/order");
+const { OrderItems } = require("../../models/order_items");
 exports.getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
@@ -54,6 +55,24 @@ exports.changeOrdersStatus = async (req, res) => {
     order.status = newStatus;
     await order.save();
     return res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
+
+exports.deleteOrder = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const order = await Order.findByIdAndDelete(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found!" });
+    for(const orderItem of order.orderItems){
+      await OrderItems.findByIdAndDelete(orderItem);
+    }
+    return res.status(204).end();
   } catch (error) {
     console.error(error);
     return res.status(500).json({
