@@ -17,9 +17,10 @@ router.delete('/categories/:id',categoriesController.deleteCategory)
 //products
 router.get('/products/count',productsController.getProductsCount);
 router.post('/products',productsController.addProduct);
+router.get('/products',productsController.getProduct);
 router.put('/products/:id',productsController.editProduct);
 router.delete('/products/:id/images',productsController.deleteProductImage);
-router.delete('/products/:id',productsController.deleteProduct);
+router.delete('/products/:id',productsController.deleteProduct); 
 
 //orders
 router.get('/orders',ordersController.getOrders);
