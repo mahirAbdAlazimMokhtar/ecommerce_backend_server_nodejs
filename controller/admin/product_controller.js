@@ -79,7 +79,23 @@ exports.addProduct = async (req, res) => {
     });
   }
 };
-exports.getProduct = async (req, res) => {};
+exports.getProduct = async (req, res) => {
+  try {
+    const page = req.body.page || 1;
+    const pageSize = 10;
+    const skip = (page - 1) * pageSize;
+    const products = await Product.find().select("-reviews -ratings")
+    .skip(skip).limit(pageSize);
+    if (!products)
+      return res.status(404).json({ message: "Products not found!" });
+    return res.status(200).json({ products });
+  } catch (error) {
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
 exports.editProduct = async (req, res) => {
   try {
     if (
@@ -216,6 +232,9 @@ exports.deleteProduct = async (req, res) => {
           await product.save();
           return res.status(204).end();
      } catch (error) {
-          
+      return res.status(500).json({
+        type: error.name,
+        message: error.message,
+      });
      }
 };
