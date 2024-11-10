@@ -11,6 +11,7 @@ const errorHandler = require('./middlewares/error_handler');
 const app = express();
 const env = process.env;
 const API = env.API_URL;
+require('./helpers/cron_jobs');
 
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
