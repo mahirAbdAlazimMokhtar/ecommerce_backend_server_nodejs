@@ -4,7 +4,7 @@ exports.getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .select(" -statusHistory")
-      .populate("user", "name,email")
+      .populate("user", "name email")
       .sort({ dateOrdered: -1 })
       .populate({
         path: "orderItems",
@@ -55,6 +55,8 @@ exports.changeOrdersStatus = async (req, res) => {
     order.status = newStatus;
     await order.save();
     return res.status(200).json(order);
+
+    
   } catch (error) {
     console.error(error);
     return res.status(500).json({
