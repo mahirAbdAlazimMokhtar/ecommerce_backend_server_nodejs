@@ -1,116 +1,109 @@
-const { User } = require("../model/user");
-const { Product } = require("../model/product");
+const { User } = require("../models/user");
+const { Product } = require("../models/product");
+const {default: mongoose} = require('mongoose');
 
-exports.getUserWishlist = async (req, res) => {
+exports.getUserWishlist = async function (req, res) {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     const wishlist = [];
-    for (const wishProductId of user.wishlist) {
-      const product = await Product.findById(wishProductId.productId);
-      if (product) {
+    for (const wishProduct of user.wishlist) {
+      const product = await Product.findById(wishProduct.productId);
+      if (!product) {
         wishlist.push({
-          ...wishProductId,
+          ...wishProduct,
           productExists: false,
           productOutOfStock: false,
         });
-      } else if (product.countInStock < 0) {
+      } else if (product.countInStock < 1) {
         wishlist.push({
-          ...wishProductId,
+          ...wishProduct,
           productExists: true,
           productOutOfStock: true,
         });
-      }else {
-          wishlist.push({
-           productId:product._id,
-           productImage:product.image,
-           productName:product.name,
-           productPrice:product.price,
-           productExists: true,
-           productOutOfStock: false
-          });
+      } else {
+        wishlist.push({
+          productId: product._id,
+          productImage: product.image,
+          productPrice: product.price,
+          productName: product.name,
+          productExists: true,
+          productOutOfStock: false,
+        });
       }
-      return res.status(200).json({ wishlist });
     }
+    return res.json(wishlist);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
 
-exports.addProductToWishlist = async (req, res) => {
+exports.addProductToWishlist = async function (req, res) {
   try {
-     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     const product = await Product.findById(req.body.productId);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: 'Could not add product. Product not found.' });
+    }
 
-    const existingProduct = user.wishlist.find((item)=>
-     item.productId.equals(new mongoose.Schema.Types.ObjectId(req.body.productId))
+    const productAlreadyExists = user.wishlist.find((item) =>
+      item.productId.equals(
+        new mongoose.Schema.Types.ObjectId(req.body.productId)
+      )
     );
-
-    if (existingProduct) {
-      return res.status(409).json({ message: "Product already exists in wishlist" });
+    if (productAlreadyExists) {
+      return res
+        .status(409)
+        .json({ message: 'Product already exists in wishlist' });
     }
 
     user.wishlist.push({
       productId: req.body.productId,
       productImage: product.image,
-      productName: product.name,
       productPrice: product.price,
+      productName: product.name,
     });
 
     await user.save();
-    return res.status(201).json({ message: "Product added to wishlist" });
+    return res.status(200).end();
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
-
-exports.deleteProductFromWishlist = async (req, res) => {
+exports.deleteProductFromWishlist = async function (req, res) {
   try {
-     const userId = req.params.id;
-     const productId = req.params.productId;
+    const userId = req.params.id;
+    const productId = req.params.productId;
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    
-    const index = user.wishlist.findIndex(
-      (item) => item.productId.equals(new mongoose.Schema.Types.ObjectId(productId))
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const index = user.wishlist.findIndex((item) =>
+      item.productId.equals(new mongoose.Schema.Types.ObjectId(productId))
     );
 
     if (index === -1) {
-      return res.status(404).json({ message: "Product not found in wishlist" });
+      return res.status(404).json({ message: 'Product not found in wishlist' });
     }
-
     user.wishlist.splice(index, 1);
+
     await user.save();
-    return res.status(204).json({ message: "Product removed from wishlist" });
-    
-    const product = await Product.findById(req.body.productId);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-    const existingProduct = user.wishlist.find((item)=>
-     item.productId.equals(new mongoose.Schema.Types.ObjectId(req.body.productId))
-    );
-    if (!existingProduct) {
-      return res.status(404).json({ message: "Product not found in wishlist" });
-    }
-    user.wishlist = user.wishlist.filter((item) => !item.productId.equals(existingProduct.productId));
-    await user.save();
-    return res.status(204).json({ message: "Product removed from wishlist" });
+    return res.status(204).end();
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
