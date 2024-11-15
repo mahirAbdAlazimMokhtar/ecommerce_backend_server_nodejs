@@ -48,7 +48,19 @@ exports.getUserCart = async (req, res) => {
   }
 };
 
-exports.getUserCartCount = async (req, res) => {};
+exports.getUserCartCount = async (req, res) => {
+     try {
+          const user = await User.findById(req.params.id);
+          if (!user) return res.status(404).json({ message: "User not found"});
+          return res.json(user.cart.length);
+     } catch (error) {
+          console.error(error);
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    }); 
+     }
+};
 exports.getCartProductById = async (req, res) => {};
 exports.addProductToCart = async (req, res) => {};
 exports.updateProductQuantityInCart = async (req, res) => {};
