@@ -12,10 +12,16 @@ const userSchema = new Schema({
   isAdmin: { type: Boolean, default: false },
   resetPasswordOtp: Number,
   resetPasswordOtpExpires: Date,
-  cart: [{type:Schema.Types.ObjectId,ref:'CartProduct'}],
+  cart: [{ 
+    type:Schema.Types.ObjectId,
+    ref:' CartProduct'}],
   wishlist: [
     {
-      productId: { type: Schema.Types.ObjectId, ref: "Product" },
+      productId: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+        required:true,
+        },
       productName: { type: String, required: true },
       productPrice: { type: Number, required: true },
       productImage: { type: String, required: true },
@@ -23,8 +29,11 @@ const userSchema = new Schema({
     },
   ],
 });
-userSchema.set('toObject',{virtuals:true});
-userSchema.set('toJSON',{virtuals:true});
+
 //How To Make Email Unique ?
 userSchema.index({email:1},{unique:true});
+
+userSchema.set('toObject', { virtuals: true });
+userSchema.set('toJSON', { virtuals: true });
+
 exports.User = model('User',userSchema);
