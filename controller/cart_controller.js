@@ -49,19 +49,57 @@ exports.getUserCart = async (req, res) => {
 };
 
 exports.getUserCartCount = async (req, res) => {
-     try {
-          const user = await User.findById(req.params.id);
-          if (!user) return res.status(404).json({ message: "User not found"});
-          return res.json(user.cart.length);
-     } catch (error) {
-          console.error(error);
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user.cart.length);
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({
       type: error.name,
       message: error.message,
-    }); 
-     }
+    });
+  }
 };
-exports.getCartProductById = async (req, res) => {};
+exports.getCartProductById = async (req, res) => {
+  try {
+    const cartProduct = await CartProduct.findById(req.params.cartProductId);
+    if(!cartProduct) return res.status(404).json({message :'Cart Product not found!'});
+    
+    const product = await Product.findById(cartProduct.product);
+    if (!product) {
+     cart.push({
+       ...cartProduct._doc,
+       productExists: false,
+       productOutOfStock: false,
+     });
+   } else {
+     cartProduct.productName = product.name;
+     cartProduct.productPrice = product.price;
+     cartProduct.productImage = product.image;
+     if (product.countInStock < cartProduct.quantity) {
+       cart.push({
+         ...cartProduct._doc,
+         productExists: true,
+         productOutOfStock: true,
+       });
+     } else {
+       cart.push({
+         ...cartProduct._doc,
+         productExists: true,
+         productOutOfStock: false,
+       });
+     }
+   }
+   return res.json(cartProduct);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      type: error.name,
+      message: error.message,
+    });
+  }
+};
 exports.addProductToCart = async (req, res) => {};
 exports.updateProductQuantityInCart = async (req, res) => {};
 exports.deleteProductFromCart = async (req, res) => {};
