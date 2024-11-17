@@ -14,7 +14,7 @@ router.get('/:id/wishlist',wishlistController.getUserWishlist);
 router.post('/:id/wishlist',wishlistController.addProductToWishlist);
 router.delete('/:id/wishlist/:productId',wishlistController.deleteProductFromWishlist);
 
-//Cart
+//Cart 
 router.get('/:id/cart',cartController.getUserCart);
 router.post('/:id/cart/count',cartController.getUserCartCount);
 router.post('/:id/cart/:cartProductId',cartController.getCartProductById);
