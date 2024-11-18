@@ -25,14 +25,18 @@ app.use(authorizePostRequests);
 const authRouter = require('./routes/auth_routes');
 const usersRouter = require('./routes/users_routers');
 const adminRouter = require('./routes/admin_routers');
-const categoryRouter = require('./routes/categories_router');
+const categoryRouter = require('./routes/categories_routers');
 const productsRouter = require('./routes/product_routers');
+const checkoutRouter = require('./routes/checkout_routers');
+const ordersRouter = require('./routes/order_routers');
 
 app.use(`${API}/`,authRouter);
 app.use(`${API}/users`,usersRouter);
 app.use(`${API}/admin`,adminRouter) ;
 app.use(`${API}/categories`,categoryRouter);
 app.use(`${API}/products`,productsRouter);
+app.use(`${API}/orders`, ordersRouter);
+app.use(`${API}/checkout`,checkoutRouter);
 app.use('/public', express.static(__dirname + '/public'));
 
 

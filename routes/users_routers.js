@@ -7,6 +7,7 @@ const cartController = require('../controller/cart_controller');
 
 router.get('/',userController.getUsers);
 router.get('/:id',userController.getUserById);
+router.get('/:id/paymentProfile',userController.getPaymentProfile);
 router.put('/:id',userController.updateUser);
 
 //Wishlist
