@@ -13,9 +13,6 @@ const validateUser = [
     .withMessage(
       "Password must contain at least one uppercase, on lowercase . and one symbol."
     ),
-  body("phone")
-    .isMobilePhone()
-    .withMessage("Please enter a valid phone number"),
 ];
 
 const validatePassword =[ body("newPassword")
