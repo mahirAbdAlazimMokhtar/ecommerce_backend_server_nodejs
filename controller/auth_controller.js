@@ -83,33 +83,34 @@ exports.login = async function (req, res) {
   }
 };
 
-exports.forgetPassword = async function (req, res) {
+exports.forgotPassword = async function (req, res) {
   try {
     const { email } = req.body;
+
     const user = await User.findOne({ email });
 
     if (!user) {
       return res
         .status(404)
-        .json({ message: "User with that email does NOT exists!" });
+        .json({ message: 'User with that email does NOT exist!' });
     }
 
     const otp = Math.floor(1000 + Math.random() * 9000);
+
     user.resetPasswordOtp = otp;
     user.resetPasswordOtpExpires = Date.now() + 600000;
+
     await user.save();
+
     const response = await mailSender.sendMail(
       email,
-      "Password Reset OTP",
-      `Your OTP for password is ${otp}`
+      'Password Reset OTP',
+      `Your OTP for password reset is: ${otp}`
     );
     return res.json({ message: response });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
 //verify token

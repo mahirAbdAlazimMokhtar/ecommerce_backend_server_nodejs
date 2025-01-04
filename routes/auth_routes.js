@@ -26,7 +26,7 @@ const validatePassword =[ body("newPassword")
 router.post("/login", authController.login);
 router.post("/register", validateUser, authController.register);
 router.post("/verify-token", authController.verifyToken);
-router.post("/forgot-password", authController.forgetPassword);
+router.post("/forgot-password", authController.forgotPassword);
 router.post("/verify-otp", authController.verifyPasswordResetOtp);
 router.post("/reset-password",validatePassword, authController.resetPassword);
 module.exports = router;
