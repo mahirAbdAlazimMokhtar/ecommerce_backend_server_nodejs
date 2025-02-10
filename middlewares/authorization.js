@@ -26,7 +26,7 @@ async function authorizePostRequests(req, res, next) {
   const authHeader = req.header("Authorization");
 
   if (!authHeader) return next();
-  const accessToken = authHeader.replace("Bearer", "").trim();
+  const accessToken = authHeader.replace('Bearer', '').trim();
   const tokenData = jwt.decode(accessToken);
 
   if (req.body.user && tokenData.id !== req.body.user) {

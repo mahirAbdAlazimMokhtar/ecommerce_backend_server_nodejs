@@ -12,7 +12,7 @@ const authorizePostRequests = require('./middlewares/authorization');
 const app = express();
 const env = process.env;
 const API = env.API_URL;
-require('./helpers/cron_jobs');
+
 
 app.use(bodyParser.json());
 app.use(morgan('tiny'));
@@ -42,6 +42,7 @@ app.use('/public', express.static(__dirname + '/public'));
 
 const PORT=env.PORT;
 const HOSTNAME=env.HOSTNAME;
+require('./helpers/cron_jobs');
 
 /// connect mongoose 
 mongoose.connect(env.MONGODB_CONNECTION_STRING).then(()=>{

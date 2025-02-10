@@ -44,42 +44,41 @@ exports.login = async function (req, res) {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    //undefended => user not exist or not found.
     if (!user) {
       return res
         .status(404)
-        .json({ message: "User not found\n Check your email and try again" });
+        .json({ message: 'User not found\nCheck your email and try again.' });
     }
     if (!bcrypt.compareSync(password, user.passwordHash)) {
-      return res.status(400).json({ message: "Incorrect Password!" });
+      return res.status(400).json({ message: 'Incorrect password!' });
     }
+
     const accessToken = jwt.sign(
       { id: user.id, isAdmin: user.isAdmin },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: '24h' }
     );
-    const refreshTokenToken = jwt.sign(
+
+    const refreshToken = jwt.sign(
       { id: user.id, isAdmin: user.isAdmin },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "60d" }
+      {
+        expiresIn: '60d',
+      }
     );
+
     const token = await Token.findOne({ userId: user.id });
     if (token) await token.deleteOne();
     await new Token({
       userId: user.id,
-      refreshToken: refreshTokenToken,
-      accessToken: accessToken,
+      accessToken,
+      refreshToken,
     }).save();
     user.passwordHash = undefined;
-    return res
-      .status(200)
-      .json({ ...user.doc, accessToken, refreshTokenToken });
+    return res.json({ ...user._doc, accessToken });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
 
@@ -118,15 +117,14 @@ exports.verifyToken = async function (req, res) {
   try {
     let accessToken = req.headers.authorization;
     if (!accessToken) return res.json(false);
-    accessToken = accessToken.replace("Bearer", "").trim();
+    accessToken = accessToken.replace('Bearer', '').trim();
 
     const token = await Token.findOne({ accessToken });
     if (!token) return res.json(false);
 
     const tokenData = jwt.decode(token.refreshToken);
 
-    const user = await User.findById(token.id);
-
+    const user = await User.findById(tokenData.id);
     if (!user) return res.json(false);
 
     const isValid = jwt.verify(
@@ -134,14 +132,10 @@ exports.verifyToken = async function (req, res) {
       process.env.REFRESH_TOKEN_SECRET
     );
     if (!isValid) return res.json(false);
-
     return res.json(true);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      type: error.name,
-      message: error.message,
-    });
+    return res.status(500).json({ type: error.name, message: error.message });
   }
 };
 
