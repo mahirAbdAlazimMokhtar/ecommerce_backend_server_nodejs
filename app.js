@@ -12,6 +12,8 @@ const authorizePostRequests = require('./middlewares/authorization');
 const app = express();
 const env = process.env;
 const API = env.API_URL;
+const compression = require('compression');
+app.use(compression());
 
 
 app.use(bodyParser.json());
