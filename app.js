@@ -4,7 +4,7 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
-const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 require('dotenv/config');
 const authjwt = require('./middlewares/jwt');
 const errorHandler = require('./middlewares/error_handler');
