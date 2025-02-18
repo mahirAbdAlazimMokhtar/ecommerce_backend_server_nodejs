@@ -26,6 +26,7 @@ exports.register = async function (req, res) {
         message: "Could not create a new user",
       });
     }
+    user.passwordHash = undefined; //remove password from response
     return res.status(201).json(user);
   } catch (error) {
     console.error(error);
@@ -49,9 +50,9 @@ exports.login = async function (req, res) {
         .status(404)
         .json({ message: 'User not found\nCheck your email and try again.' });
     }
-    if (!bcrypt.compareSync(password, user.passwordHash)) {
+    if (!user.passwordHash || !bcrypt.compareSync(password, user.passwordHash)) {
       return res.status(400).json({ message: 'Incorrect password!' });
-    }
+    }    
 
     const accessToken = jwt.sign(
       { id: user.id, isAdmin: user.isAdmin },
@@ -122,7 +123,8 @@ exports.verifyToken = async function (req, res) {
     const token = await Token.findOne({ accessToken });
     if (!token) return res.json(false);
 
-    const tokenData = jwt.decode(token.refreshToken);
+    const tokenData = jwt.verify(token.refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
 
     const user = await User.findById(tokenData.id);
     if (!user) return res.json(false);
@@ -187,11 +189,15 @@ exports.resetPassword = async function (req, res) {
       return res
         .status(404)
         .json({ message: "User with that email does NOT exists!" });
-    if (user.resetPasswordOtp !== 1) {
-      return res
-        .status(401)
-        .json({ message: "Confirm OTP before resetting password" });
-    }
+        if (user.resetPasswordOtp !== 1 || !user.resetPasswordOtpExpires) {
+          return res.status(401).json({ message: "Confirm OTP before resetting password" });
+        }
+        
+        // تأكد من أن كلمة المرور الجديدة ليست نفسها القديمة
+        if (bcrypt.compareSync(newPassword, user.passwordHash)) {
+          return res.status(400).json({ message: "New password must be different from the old password" });
+        }
+        
 
     user.passwordHash = bcrypt.hashSync(newPassword, 8);
     user.resetPasswordOtp = undefined;
