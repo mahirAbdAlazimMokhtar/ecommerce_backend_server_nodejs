@@ -8,16 +8,18 @@ const { User } = require("../models/user");
  * @throws {Error} If there is an error finding users in the database
  */
 exports.getUsers = async (_, res) => {
-  //Fetch The Data Form The Data Base
   try {
     const users = await User.find().select("name email id isAdmin");
-    if (!users) return res.status(404).json({ message: "Users not Found !" });
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found!" });
+    }
     return res.status(200).json({ users });
   } catch (error) {
-    console.error(error);
+    console.error("Error in getUsers:", error.message, error.stack);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
+/**
 
 /**
  * Fetch a user by ID from the database.
@@ -30,16 +32,16 @@ exports.getUsers = async (_, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select(
-      "-passwordHash -resetPasswordOtpExpires -resetPasswordOtp - cart"
+      "-passwordHash -resetPasswordOtpExpires -resetPasswordOtp -cart"
     );
-    if (!user) return res.status(404).json({ message: "User not Found !" });
-    user.passwordHash = undefined;
+    if (!user) return res.status(404).json({ message: "User not found!" });
     return res.status(200).json({ user });
   } catch (error) {
-    console.error(error);
+    console.error("Error in getUserById:", error.message, error.stack);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
+
 
 /**
  * Update a user in the database by ID.
@@ -55,38 +57,46 @@ exports.updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { name, email, phone },
-      { new: true }
+      { new: true, runValidators: true } // إضافة `runValidators` لضمان صحة البيانات
     );
-    if (!user) return res.status(404).
-    json({ message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
     user.passwordHash = undefined;
     user.cart = undefined;
     return res.json(user);
   } catch (error) {
-    console.error(error);
+    console.error("Error in updateUser:", error.message, error.stack);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
+
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // تأكد من استيراد stripe
 
 exports.getPaymentProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    } else if (!user.paymentCustomerId) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    if (!user.paymentCustomerId) {
       return res.status(404).json({
-        message:
-          'You do not have a payment profile yet. Complete an order to see your payment profile.',
+        message: "You do not have a payment profile yet. Complete an order to see your payment profile.",
       });
     }
+
     const session = await stripe.billingPortal.sessions.create({
       customer: user.paymentCustomerId,
-      return_url: 'https://dbestech.biz/ecomly',
+      return_url: process.env.RETURN_URL || "https://dbestech.biz/ecomly",
     });
 
     return res.json({ url: session.url });
   } catch (error) {
-    console.error(error);
+    console.error("Error in getPaymentProfile:", error.message, error.stack);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
