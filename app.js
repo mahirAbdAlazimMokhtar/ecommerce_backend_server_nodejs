@@ -44,7 +44,7 @@ app.use('/public', express.static(__dirname + '/public'));
 
 
 const PORT=env.PORT;
-const HOSTNAME=env.HOSTNAME;
+const HOSTNAME=env.HOSTNAME || '0.0.0.0';
 require('./helpers/cron_jobs');
 
 /// connect mongoose 
