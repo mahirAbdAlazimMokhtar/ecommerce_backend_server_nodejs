@@ -74,29 +74,25 @@ exports.updateUser = async (req, res) => {
 };
 
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY); // تأكد من استيراد stripe
-
 exports.getPaymentProfile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    
-    if (!user.paymentCustomerId) {
+      return res.status(404).json({ message: 'User not found' });
+    } else if (!user.paymentCustomerId) {
       return res.status(404).json({
-        message: "You do not have a payment profile yet. Complete an order to see your payment profile.",
+        message:
+          'You do not have a payment profile yet. Complete an order to see your payment profile.',
       });
     }
-
     const session = await stripe.billingPortal.sessions.create({
       customer: user.paymentCustomerId,
-      return_url: process.env.RETURN_URL || "https://dbestech.biz/ecomly",
+      return_url: 'https://dbestech.biz/ecomly',
     });
 
     return res.json({ url: session.url });
   } catch (error) {
-    console.error("Error in getPaymentProfile:", error.message, error.stack);
+    console.error(error);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
