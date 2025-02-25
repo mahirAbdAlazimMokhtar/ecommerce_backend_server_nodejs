@@ -4,9 +4,18 @@ const util = require("util");
 exports.addCategory = async (req, res) => {
   try {
     // Promisify the media upload function
-    const uploadImage = util.promisify(
-      media_helper.uploadMedia.fields([{ name: "image", maxCount: 1 }])
-    );
+    const uploadImage = (req, res) => {
+      return new Promise((resolve, reject) => {
+        media_helper.uploadMedia.fields([{ name: "image", maxCount: 1 }])(
+          req,
+          res,
+          (err) => {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
+    };
 
     // Attempt to upload the image
     try {
@@ -21,10 +30,9 @@ exports.addCategory = async (req, res) => {
     }
 
     // Check if the image was uploaded
-    const image = req.files["image"] ? req.files["image"][0] : null;
-    if (!image) {
-      return res.status(400).json({ message: "No image uploaded" });
-    }
+    const image = req.files && req.files["image"] ? req.files["image"][0] : null;
+    if (!image) return res.status(400).json({ message: "No image uploaded" });
+    
 
     // Construct the image URL
     req.body["image"] = `${req.protocol}://${req.get("host")}/${image.path}`;

@@ -1,6 +1,12 @@
 const multer = require("multer");
+const fs = require("fs");
 const path = require("path");
 const { unlink } = require("fs/promises");
+
+const uploadDir = path.join(__dirname, "..", "public", "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 const ALLOWED_EXTENSION = {
   "image/png": "png",
   "image/jpeg": "jpg",
@@ -13,10 +19,8 @@ const storage = multer.diskStorage({
   },
   filename: (_, file, cb) => {
     const filename = file.originalname
-      .replace(" ", "-")
-      .replace(".png", "")
-      .replace(".jpg", "")
-      .replace(".jpeg", "");
+    .replace(/ /g, "-")
+    .replace(/\.(png|jpg|jpeg)$/, "");
     const extension = ALLOWED_EXTENSION[file.mimetype];
     cb(null, `${filename}-${Date.now()}.${extension}`);
   },
@@ -32,7 +36,7 @@ exports.uploadMedia = multer({
     const isValid = ALLOWED_EXTENSION[file.mimetype];
 
     let uploadError = new Error(
-      "Invalid image type\n ${file.mimetype} is not allowed"
+        `Invalid image type: ${file.mimetype} is not allowed`
     );
     if (!isValid) return cb(uploadError);
     return cb(null, true);
