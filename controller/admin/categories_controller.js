@@ -3,33 +3,48 @@ const media_helper = require("../../helpers/media_helper");
 const util = require("util");
 exports.addCategory = async (req, res) => {
   try {
+    // Promisify the media upload function
     const uploadImage = util.promisify(
       media_helper.uploadMedia.fields([{ name: "image", maxCount: 1 }])
     );
+
+    // Attempt to upload the image
     try {
       await uploadImage(req, res);
     } catch (error) {
-      console.error(error);
+      console.error("Image upload error:", error);
       return res.status(500).json({
-        type: error.code,
-        message: ` ${error.message}{${err.fields} || ''}`,
-        storageErrors: error.storageErrors,
+        type: error.code || "UPLOAD_ERROR",
+        message: error.message,
+        storageErrors: error.storageErrors || [],
       });
     }
-    const image = req.files["image"][0];
-    if (!image) return res.status(400).json({ message: "No image uploaded" });
+
+    // Check if the image was uploaded
+    const image = req.files["image"] ? req.files["image"][0] : null;
+    if (!image) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    // Construct the image URL
     req.body["image"] = `${req.protocol}://${req.get("host")}/${image.path}`;
+
+    // Create and save the category
     const category = new Category(req.body);
     await category.save();
-    if (!category)
-      return res.status(500).json({ message: "Could not create category" });
 
+    // Check if the category was successfully created
+    if (!category) {
+      return res.status(500).json({ message: "Could not create category" });
+    }
+
+    // Return the created category
     return res.status(201).json(category);
   } catch (error) {
-    console.error(error);
+    console.error("Unexpected error:", error);
     return res.status(500).json({
-      type: error.name,
-      message: error.message,
+      type: error.name || "UNKNOWN_ERROR",
+      message: error.message || "An unexpected error occurred",
     });
   }
 };
