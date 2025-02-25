@@ -18,21 +18,20 @@ const productSchema = new Schema({
 });
 
 productSchema.pre("save", async function (next) {
-     if (this.reviews.length > 0) {
-          await this.populate("reviews");
-          const reviews = this.reviews.reduce(
-               (acc, review) => acc + review.rating,
-               (acc, review) => acc + review.rating,
-               0
-          );
-
-          this.rating = totalRating / this.reviews.length;
-          this.rating = parseFloat((totalRating / this.reviews.length).toFixed(1));
-          this.numberOfReviews = this.reviews.length;
+     if (Array.isArray(this.reviews) && this.reviews.length > 0) {
+         await this.populate("reviews");
+ 
+         // جمع التقييمات
+         const totalRating = this.reviews.reduce((acc, review) => acc + review.rating, 0);
+ 
+         // حساب المعدل مع ضمان عدم القسمة على الصفر
+         this.rating = parseFloat((totalRating / this.reviews.length).toFixed(1));
+         this.numberOfReviews = this.reviews.length;
      }
-
+ 
      next();
-});
+ });
+ 
 
 
 // productSchema.virtual('productInitials').get(function () {

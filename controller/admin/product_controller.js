@@ -48,10 +48,10 @@ exports.addProduct = async (req, res) => {
           "Category marked for deletion, you cannot add products to this category",
       });
     }
-    const image = req.files["image"][0];
+    const image = req.files["image"] ? req.files["image"][0] : null;
     if (!image) return res.status(400).json({ message: "No image uploaded" });
     req.body["image"] = `${req.protocol}://${req.get("host")}/${image.path}`;
-    const gallery = req.files["images"][0];
+    const gallery = req.files["images"] || [];
     const imagePaths = [];
 
     if (gallery) {
@@ -70,7 +70,7 @@ exports.addProduct = async (req, res) => {
     return res.status(201).json(product);
   } catch (error) {
     console.error(error);
-    if (err instanceof multer.MulterError) {
+    if (error instanceof multer.MulterError) {
       return res.status(err.code).json({ message: err.message });
     }
     return res.status(500).json({
