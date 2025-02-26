@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const { default: mongoose } = require("mongoose");
 
 async function authorizePostRequests(req, res, next) {
+  if (req.originalUrl.startsWith("/public/uploads/")) {
+    return next();
+  }
   if (req.method !== "POST") return next();
   const API = process.env.API_URL;
   if (req.originalUrl.startsWith(`${API}/admin`)) return next();

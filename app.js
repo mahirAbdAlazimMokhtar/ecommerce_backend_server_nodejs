@@ -2,6 +2,7 @@ const bodyParser = require("body-parser");
 const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
+const path = require("path");
 const mongoose = require('mongoose');
 const jsonwebtoken = require('jsonwebtoken');
 require('dotenv/config');
@@ -9,7 +10,8 @@ const authjwt = require('./middlewares/jwt');
 const errorHandler = require('./middlewares/error_handler');
 const authorizePostRequests = require('./middlewares/authorization');
 
-
+// السماح بعرض الصور بدون توثيق
+app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
 const app = express();
 const env = process.env;
 const API = env.API_URL;
@@ -40,7 +42,6 @@ app.use(`${API}/categories`,categoryRouter);
 app.use(`${API}/products`,productsRouter);
 app.use(`${API}/orders`, ordersRouter);
 app.use(`${API}/checkout`,checkoutRouter);
-app.use('/public', express.static(__dirname + '/public'));
 
 
 const PORT=env.PORT;
