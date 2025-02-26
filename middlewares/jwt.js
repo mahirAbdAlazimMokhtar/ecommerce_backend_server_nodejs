@@ -30,6 +30,7 @@ function authjwt() {
 
       `${API}/reset-password`,
       `${API}/reset-password/`,
+      { url: /^\/public\/uploads\/.*/, methods: ['GET'] }
     ],
   });
 }

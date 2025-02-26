@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 app.use(morgan('tiny'));
 app.use(cors());
 app.options('*',cors());
+app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
 app.use(authjwt());
 app.use(errorHandler);
 app.use(authorizePostRequests);
@@ -40,9 +41,8 @@ app.use(`${API}/admin`,adminRouter) ;
 app.use(`${API}/categories`,categoryRouter);
 app.use(`${API}/products`,productsRouter);
 app.use(`${API}/orders`, ordersRouter);
-app.use(`${API}/checkout`,checkoutRouter);
-// السماح بعرض الصور بدون توثيق
-app.use("/public/uploads", express.static(path.join(__dirname, "public/uploads")));
+
+
 
 
 const PORT=env.PORT;
