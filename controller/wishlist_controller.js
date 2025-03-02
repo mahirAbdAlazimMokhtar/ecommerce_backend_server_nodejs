@@ -44,27 +44,30 @@ exports.getUserWishlist = async function (req, res) {
 
 exports.addProductToWishlist = async function (req, res) {
   try {
+    console.log("Received request to add to wishlist");
+    console.log("User ID:", req.params.id);
+    console.log("Request Body:", req.body);
+
+    if (!req.params.id || !req.body.productId) {
+      return res.status(400).json({ message: "User ID and Product ID are required" });
+    }
+
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const product = await Product.findById(req.body.productId);
     if (!product) {
-      return res
-        .status(404)
-        .json({ message: 'Could not add product. Product not found.' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     const productAlreadyExists = user.wishlist.find((item) =>
-      item.productId.equals(
-        new mongoose.Schema.Types.ObjectId(req.body.productId)
-      )
+      item.productId.toString() === req.body.productId
     );
+
     if (productAlreadyExists) {
-      return res
-        .status(409)
-        .json({ message: 'Product already exists in wishlist' });
+      return res.status(409).json({ message: "Product already exists in wishlist" });
     }
 
     user.wishlist.push({
@@ -75,12 +78,13 @@ exports.addProductToWishlist = async function (req, res) {
     });
 
     await user.save();
-    return res.status(200).end();
+    return res.status(200).json({ message: "Product added successfully", wishlist: user.wishlist });
   } catch (error) {
-    console.error(error);
+    console.error("Error:", error);
     return res.status(500).json({ type: error.name, message: error.message });
   }
 };
+
 exports.deleteProductFromWishlist = async function (req, res) {
   try {
     const userId = req.params.id;
