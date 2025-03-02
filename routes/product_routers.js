@@ -8,7 +8,7 @@ router.get("/",productsController.getProducts);
 router.get("/search",productsController.searchProduct);
 router.get("/:id",productsController.getProductById);
 //reviews
-router.get("/:id/reviews",reviewController.leaveReview);
-router.post("/:id/reviews",reviewController.getProductsReviews);
+router.post("/:id/reviews",reviewController.leaveReview);
+router.get("/:id/reviews",reviewController.getProductsReviews);
 
 module.exports = router;

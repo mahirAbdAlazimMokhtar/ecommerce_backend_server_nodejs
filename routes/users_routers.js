@@ -17,8 +17,8 @@ router.delete('/:id/wishlist/:productId',wishlistController.deleteProductFromWis
 
 //Cart 
 router.get('/:id/cart',cartController.getUserCart);
-router.post('/:id/cart/count',cartController.getUserCartCount);
-router.post('/:id/cart/:cartProductId',cartController.getCartProductById);
+router.get('/:id/cart/count',cartController.getUserCartCount);
+router.get('/:id/cart/:cartProductId',cartController.getCartProductById);
 router.post('/:id/cart',cartController.addProductToCart);
 router.put('/:id/cart/:cartProductId',cartController.updateProductQuantityInCart);
 router.delete('/:id/cart/:carProductId',cartController.deleteProductFromCart);
